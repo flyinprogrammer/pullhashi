@@ -55,3 +55,8 @@ versions of tooling locally.
 
 Vagrant is all Ruby, and their packaging and releasing of it make the [JSON](https://releases.hashicorp.com/index.json)
 all different and weird. If someone wants to submit a PR I would gladly review it.
+
+# TODO
+
+- `docker-base` zip contains a `bin` directory, we should flatten that or drop support.
+- can probably drop support for `docker-basetool` and `otto`.
