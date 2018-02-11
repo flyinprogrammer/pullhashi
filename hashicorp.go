@@ -1,4 +1,4 @@
-package lib
+package pullhashi
 
 const (
 	// HashicorpKey the Public GPG key that Hashicorp Publishes: https://www.hashicorp.com/security

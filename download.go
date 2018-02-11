@@ -1,9 +1,11 @@
-package lib
+package pullhashi
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -39,6 +41,7 @@ func downloadProducts(osName, archName, bindir string) {
 	}
 
 	wg.Wait()
+	err = removeEmptyBinBin(bindir + "/bin")
 }
 
 func downloadFiles(tmpdir, bindir string, p DownloadProduct) {
@@ -81,4 +84,54 @@ func downloadFiles(tmpdir, bindir string, p DownloadProduct) {
 			Str("product", p.Name).
 			Msg("created: " + f)
 	}
+	err = cleanUpNestedBin(unzipFiles)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func cleanUpNestedBin(files []string) error {
+	for _, f := range files {
+		if strings.Contains(f, "/bin/bin/") {
+			// we have a nested bin
+			newPath := strings.Replace(f, "bin/", "", 1)
+			log.Info().Str("og", f).Str("new", f).Msg("moving file")
+			err := os.Rename(f, newPath)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func removeEmptyBinBin(dir string) error {
+	empty, err := isEmptyDir(dir)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "no such file or directory") {
+			return nil
+		}
+		log.Debug().Bool("empty", empty).Err(err).Msg("error testing if empty dir")
+		return err
+	}
+	if empty {
+		log.Debug().Str("dir", dir).Msg("removing empty dir")
+		os.RemoveAll(dir)
+	}
+	return nil
+}
+
+func isEmptyDir(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
 }

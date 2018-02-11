@@ -1,4 +1,4 @@
-package lib
+package pullhashi
 
 // Products a map of products
 type Products map[string]Product
