@@ -26,6 +26,11 @@ func skipProduct(os, arch string, product DownloadProduct) bool {
 			Str("product", product.Name).
 			Msg("skipping because: https://www.hashicorp.com/blog/vagrant-cloud-migration-announcement")
 		return true
+	case product.Name == "envconsul" && product.Version == "0.8.0":
+		log.Debug().
+			Str("product", product.Name).
+			Msg("skipping because: https://github.com/hashicorp/envconsul/issues/214")
+		return true
 	default:
 		return false
 	}

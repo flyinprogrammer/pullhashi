@@ -52,6 +52,7 @@ func downloadFiles(tmpdir, bindir string, p DownloadProduct) {
 	}
 
 	// Verify GPG
+	log.Debug().Str("product", p.Name).Msg("about to validate signing")
 	err := ShaIsSigned(tmpdir+"/"+p.SIG, tmpdir+"/"+p.SHASUM)
 	if err != nil {
 		panic(err)
